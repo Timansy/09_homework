@@ -1,4 +1,6 @@
 //https://api.github.com/users/Timansy
+//[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+//[![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg)](https://bitbucket.org/lbesson/ansi-colors)
 
 const inquirer = require('inquirer');
 const axios = require("axios")
@@ -13,17 +15,22 @@ function getCurrentDirectoryName() {
 };
 
 function getGithubInfo(user) {
-    var resp = axios.get(`https://api.github.com/users/${user}`)
+    var resp = axios.get(`https://api.github.com/users/${user}`, {
+        headers: {
+            authorization: `token 6140073a91d485f651909bb1eab80bd3909bc516`
+        }
+    })
         .then(response => {
             var res = [];
             // console.log(response);
             res.push(response.data.avatar_url);
             res.push(response.data.name);
             res.push(response.data.email);
-            console.log(res);
+            // console.log(res);
             return res;
         }).catch(error => {
             console.log(error);
+
         });
     return resp;
 }
@@ -31,12 +38,35 @@ function getGithubInfo(user) {
 function writeToFile(answers) {
     var gethubinfo = getGithubInfo(answers.githubname);
     gethubinfo.then(resdata => {
+        //badge grabbin
+        var badge = "![Maintenance](https://img.shields.io/badge/maintained-yes-green)";
+        
+        if (answers.maintained != "yes"){
+            badge = "![Maintenance](https://img.shields.io/badge/maintained-no-red)";
+        }
         var data = `
 # ${answers.title}
 
+${badge}
+        
 ## Project Description
 ${answers.description}
-    
+
+## Table of Contents
+[\`Project Description\`](#project-description)
+
+[\`Usage\`](#usage)
+
+[\`License\`](#license)
+
+[\`Contributing\`](#contributing)
+
+[\`FAQ\`](#faq)
+
+[\`Author\`](#author)
+
+[\`GitHub Page\`](#github-page)
+
 ## Usage
 ${answers.usage}
     
@@ -55,17 +85,17 @@ ${answers.questions}
 
 <img src="${resdata[0]}" alt="${answers.description}s GitHub Image" width="50"/>
 
-## GitHub Page
+## GitHub Page {#ProjectDescription}
 
 \`\`\`
 https://${answers.name}.github.io/${answers.title}
 \`\`\`
 `;
 
-        console.log("about to write");
+        console.log("about to write...");
         fs.writeFile("README.MD", data, function (err) {
             if (err) return console.log(err);
-            console.log('README.MD creadTimted successfully');
+            console.log('README.MD creadted successfully');
         });
 
     });
@@ -128,10 +158,14 @@ function askQuestions() {
             name: 'questions',
             message: 'FAQ:'
         }
+        , {
+            type: 'input',
+            name: 'maintained',
+            message: 'Is this repository maintained? (any non-"yes" answer results in "no"',
+            default:'yes'
+        }
     ])
         .then(answers => {
-            // console.log(answers);
-            console.log("here");
             writeToFile(answers);
         })
         .catch(error => {
@@ -143,17 +177,5 @@ function askQuestions() {
         });
 
 }
-// const questions = [
 
-// ];
-
-// function writeToFile(fileName, data) {
-// }
-
-// function init() {
-
-// }
-
-// init();
 askQuestions();
-// getCurrentDirectoryName();
