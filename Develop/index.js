@@ -16,9 +16,9 @@ function getCurrentDirectoryName() {
 
 function getGithubInfo(user) {
     var resp = axios.get(`https://api.github.com/users/${user}`, {
-        headers: {
-            authorization: `token 6140073a91d485f651909bb1eab80bd3909bc516`
-        }
+        // headers: {
+        //     authorization: `token 6140073a91d485f651909bb1eab80bd3909bc516`
+        // }
     })
         .then(response => {
             var res = [];
